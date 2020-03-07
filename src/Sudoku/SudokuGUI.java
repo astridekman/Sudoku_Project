@@ -21,14 +21,19 @@ import javax.swing.border.Border;
 public class SudokuGUI {
 	JPanel[][] board;
 	JTextField[][] textFields;
+	Color[][] colors;
 	JFrame frame;
 	JPanel topPanel;
 	JPanel boardPanel;
 	JPanel buttonPanel;
+	Color boardColor;
 	
 	public SudokuGUI() {
 		board = new JPanel[9][9];
 		textFields = new JTextField[9][9];
+		boardColor = new Color(240,248,255);
+		colors = new Color[9][9];
+		setColors();
 		SwingUtilities.invokeLater(() -> createWindow());
 	}
 
@@ -73,29 +78,23 @@ public class SudokuGUI {
 		
 		GridLayout layOut = new GridLayout(9, 9);
 		boardPanel.setLayout(layOut);
-		
-		Color color = new Color(240,248,255);
+
 		layOut.setHgap(6);
-		boardPanel.setBackground(color);
+		boardPanel.setBackground(boardColor);
 
 		
 		return boardPanel;
 	}
 	
 	public void addToBoardPanel(JPanel boardPanel) {
-		Color color = new Color(255,255,255);
 		
-		int passedRows = 0;
-		boolean newRow = false;
 
 		
 		for(int row = 0; row < 9; row++) {
 			for (int col = 0; col < 9; col++) {
 				board[row][col] = new JPanel();
 				
-				if (col%3 == 0 && newRow == false) {
-					color = changeColor(color);					
-				}
+				Color color = colors[row][col];
 				
 				JPanel subPanel = new JPanel();
 				subPanel.setBackground(color);
@@ -135,17 +134,10 @@ public class SudokuGUI {
 		        
 		        textFields[row][col] = textField;
 				board[row][col].add(subPanel);
-				newRow = false;
+				
 				
 			}
-			
-			passedRows++;
-			
-			if (passedRows == 3 || passedRows == 6) {
-				color = changeColor(color);
-			}
-			newRow = true;
-			
+		
 			}
 
 		
@@ -173,6 +165,31 @@ public class SudokuGUI {
         buttonPanel.add(clearButton);
         
         return buttonPanel;
+	}
+	
+	public void setColors() {
+		Color color = new Color(255,255,255);	
+		int passedRows = 0;
+		boolean newRow = false;
+		
+		for (int row = 0; row < 9; row++) {
+			for (int col = 0; col < 9; col++) {
+				if (col%3 == 0 && newRow == false) {
+					color = changeColor(color);					
+				}
+				
+				colors[row][col] = color;
+				
+				newRow = false;
+			}
+			
+			passedRows++;
+			if (passedRows == 3 || passedRows == 6) {
+				color = changeColor(color);
+			}
+			newRow = true;
+		}
+		
 	}
 	
 	public Color changeColor(Color color) {
@@ -211,11 +228,15 @@ public class SudokuGUI {
 		
 		int[][] solvedBoard = sudokuBoard.plan;
 		frame.invalidate();
+
 		
 		for(int i = 0; i < 9; i++) {
 			for(int j = 0; j < 9; j++) {
 				JPanel subPanel = board[i][j];
 				subPanel.remove(0);
+				subPanel.setOpaque(true);
+				//subPanel.setPreferredSize(new Dimension(70,70));
+				subPanel.setBackground(colors[i][j]);
 				
 				Integer intVal = solvedBoard[i][j];
 				String val = intVal.toString();
@@ -224,7 +245,10 @@ public class SudokuGUI {
 				
 				Font font1 = new Font("SansSerif", Font.BOLD, 12);
 		        label.setFont(font1);
-		        label.setSize(70,70);
+		       // label.setOpaque(true);	
+		        //label.setSize(70,70);
+		        label.setBackground(colors[i][j]);
+		        
 		        
 		        subPanel.add(label);
 				
@@ -239,5 +263,13 @@ public class SudokuGUI {
 	
 	
 	public void clearButtonPressed() {
+		frame.invalidate();
+		for(int i = 0; i < 9; i++) {
+			for(int j = 0; j < 9; j++) {
+				JTextField textField = textFields[i][j];
+				textField.setText("");
+			}
+		}
+		frame.validate();
 	}
 }
