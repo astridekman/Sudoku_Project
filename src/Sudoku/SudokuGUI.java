@@ -12,6 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -44,7 +45,7 @@ public class SudokuGUI {
 		topPanel = createTopPanel();
 		boardPanel = createBoardPanel();
 		
-		addToBoardPanel(boardPanel);		
+		addToBoardPanel(boardPanel);	//Adds 9x9 small squares to the panel	
 		buttonPanel = createButtonPanel();
 		
 		topPanel.add(boardPanel);
@@ -79,51 +80,43 @@ public class SudokuGUI {
 
 		layOut.setHgap(6);
 		boardPanel.setBackground(boardColor);
+		
+		boardPanel.setPreferredSize(new Dimension(410,410));
+	    boardPanel.setOpaque(true);
 
 		
 		return boardPanel;
 	}
 	
-	public void addToBoardPanel(JPanel boardPanel) {
-		
-
-		
+	//Adds 9x9 small squares to the panel
+	public void addToBoardPanel(JPanel boardPanel) {		
 		for(int row = 0; row < 9; row++) {
 			for (int col = 0; col < 9; col++) {
 				board[row][col] = new JPanel();
 				
 				Color color = colors[row][col];
-				
 				JPanel subPanel = new JPanel();
 				subPanel.setBackground(color);
 				subPanel.setPreferredSize(new Dimension(70,70));
 		        subPanel.setOpaque(true);		
-				
-				boardPanel.setPreferredSize(new Dimension(410,410));
-			    boardPanel.setOpaque(true);
-			        
 
-		        
 		        JTextField textField = new JTextField(2);
-		       
 		        textField.setBackground(color);
-		        Font font1 = new Font("SansSerif", Font.BOLD, 12);
-		        textField.setFont(font1);
+		        Font font = new Font("SansSerif", Font.BOLD, 12);
+		        textField.setFont(font);
 		        textField.setSize(70,70);
 		        
-		        Border border = BorderFactory.createLineBorder(color, 5);
+		        Border border = BorderFactory.createLineBorder(color, 5); //border between squares
 		        textField.setBorder(border);
 		        
+		        //Only allow numbers 0-9 and clear key (id 8)
 		        textField.addKeyListener(new KeyAdapter() {
 		            public void keyPressed(KeyEvent ke) {
 		               String value = textField.getText();
-		               int l = value.length();
-		               if (ke.getKeyChar() >= '0' && ke.getKeyChar() <= '9' && value.length() < 1) {
+		               if (ke.getKeyChar() >= '0' && ke.getKeyChar() <= '9' && value.length() < 1 || ke.getKeyCode() == 8) {
 		            	   textField.setEditable(true);
-		                  //label.setText("");
 		               } else {
 		            	   textField.setEditable(false);
-		                  //label.setText("* Enter only numeric digits(0-9)");
 		               }
 		            }
 		         });
@@ -132,7 +125,6 @@ public class SudokuGUI {
 		        
 		        textFields[row][col] = textField;
 				board[row][col].add(subPanel);
-				
 				
 			}
 		
@@ -190,6 +182,7 @@ public class SudokuGUI {
 		
 	}
 	
+	//If color is orange, change to white and vice versa
 	public Color changeColor(Color color) {
 		int red = color.getRed();;
 		int green = color.getGreen();
@@ -227,13 +220,17 @@ public class SudokuGUI {
 			showSolution(sudokuBoard);
 		}
 		
+		else {
+			JOptionPane.showMessageDialog(frame, "Solution does not exist. Try again!");
+		}
+		
 		
 		
 	}
 
 
 	public void showSolution(SudokuBoard sudokuBoard) {
-		int[][] solvedBoard = sudokuBoard.plan;
+		int[][] solvedBoard = sudokuBoard.board;
 		frame.invalidate();
 
 		

@@ -76,7 +76,7 @@ class TestSudoku {
 		
 
 		
-		assertArrayEquals(correctSolution, sudokuBoard.plan);
+		assertArrayEquals(correctSolution, sudokuBoard.board);
 		
 		
 		
