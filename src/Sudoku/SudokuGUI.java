@@ -27,27 +27,25 @@ public class SudokuGUI {
 	JPanel boardPanel;
 	JPanel buttonPanel;
 	Color boardColor;
+	boolean sudokuSolved;
 	
 	public SudokuGUI() {
 		board = new JPanel[9][9];
 		textFields = new JTextField[9][9];
 		boardColor = new Color(240,248,255);
 		colors = new Color[9][9];
+		sudokuSolved = false;
 		setColors();
 		SwingUtilities.invokeLater(() -> createWindow());
 	}
 
 	private void createWindow() {
-		frame = createFrame();
-		
+		frame = createFrame();		
 		topPanel = createTopPanel();
-		
 		boardPanel = createBoardPanel();
-		addToBoardPanel(boardPanel);
 		
+		addToBoardPanel(boardPanel);		
 		buttonPanel = createButtonPanel();
-	
-
 		
 		topPanel.add(boardPanel);
         topPanel.add(buttonPanel);
@@ -210,6 +208,7 @@ public class SudokuGUI {
 	}
 	
 	public void solveButtonPressed() {
+		sudokuSolved = true;
 		SudokuBoard sudokuBoard = new SudokuBoard();
 		for(int i = 0; i < 9; i++) {
 			for(int j = 0; j < 9; j++) {
@@ -224,52 +223,55 @@ public class SudokuGUI {
 			}
 		}
 		
-		sudokuBoard.solve(0, 0);
+		if (sudokuBoard.solve(0, 0)) {
+			showSolution(sudokuBoard);
+		}
 		
+		
+		
+	}
+
+
+	public void showSolution(SudokuBoard sudokuBoard) {
 		int[][] solvedBoard = sudokuBoard.plan;
 		frame.invalidate();
 
 		
 		for(int i = 0; i < 9; i++) {
 			for(int j = 0; j < 9; j++) {
-				JPanel subPanel = board[i][j];
-				subPanel.remove(0);
-				subPanel.setOpaque(true);
-				//subPanel.setPreferredSize(new Dimension(70,70));
-				subPanel.setBackground(colors[i][j]);
 				
 				Integer intVal = solvedBoard[i][j];
 				String val = intVal.toString();
-				
-				JLabel label = new JLabel(val);
-				
-				Font font1 = new Font("SansSerif", Font.BOLD, 12);
-		        label.setFont(font1);
-		       // label.setOpaque(true);	
-		        //label.setSize(70,70);
-		        label.setBackground(colors[i][j]);
 		        
-		        
-		        subPanel.add(label);
+				textFields[i][j].setText(val);
+				
+				textFields[i][j].setEditable(false);
 				
 				
 			}
 		}
 		
 		frame.validate();
-		
 	}
 	
 	
 	
 	public void clearButtonPressed() {
-		frame.invalidate();
-		for(int i = 0; i < 9; i++) {
-			for(int j = 0; j < 9; j++) {
-				JTextField textField = textFields[i][j];
-				textField.setText("");
-			}
+		if (sudokuSolved) {
+			new SudokuGUI();
 		}
-		frame.validate();
+		
+		else {
+			frame.invalidate();
+			for(int i = 0; i < 9; i++) {
+				for(int j = 0; j < 9; j++) {
+					JTextField textField = textFields[i][j];
+					textField.setText("");
+				}
+			}
+			frame.validate();
+		}
+		
+		
 	}
 }
